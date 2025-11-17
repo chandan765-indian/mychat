@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-time Chat</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #eef2f3;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        #messages {
+            height: 350px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        .input-area {
+            display: flex;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+        }
+        button {
+            padding: 10px 20px;
+            background: blue;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkblue;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center;">Online Chat</h2>
+
+    <input type="text" id="username" placeholder="Enter your name..." style="margin-bottom: 10px; width: 100%; padding:10px;">
+
+    <div id="messages"></div>
+
+    <div class="input-area">
+        <input type="text" id="msg" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<!-- Firebase v8 Scripts (needed for browser apps) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    // Your Firebase config (converted for v8)
+    const firebaseConfig = {
+        apiKey: "AIzaSyC259lPvHWOm5g5uwtEbUyvpL2Lzyiqx2o",
+        authDomain: "mychat-5986e.firebaseapp.com",
+        databaseURL: "https://mychat-5986e-default-rtdb.firebaseio.com/",
+        projectId: "mychat-5986e",
+        storageBucket: "mychat-5986e.firebasestorage.app",
+        messagingSenderId: "518028385216",
+        appId: "1:518028385216:web:95c0657a896a57c5bbc625",
+        measurementId: "G-2YC3GLY47W"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    let db = firebase.database();
+
+    function sendMessage() {
+        let name = document.getElementById("username").value;
+        let message = document.getElementById("msg").value;
+
+        if (name.trim() === "" || message.trim() === "") return;
+
+        db.ref("messages").push({
+            user: name,
+            text: message
+        });
+
+        document.getElementById("msg").value = "";
+    }
+
+    db.ref("messages").on("child_added", function(snapshot) {
+        let data = snapshot.val();
+        let msgDiv = document.getElementById("messages");
+
+        msgDiv.innerHTML += `<p><b>${data.user}:</b> ${data.text}</p>`;
+        msgDiv.scrollTop = msgDiv.scrollHeight;
+    });
+</script>
+
+</body>
+</html>
